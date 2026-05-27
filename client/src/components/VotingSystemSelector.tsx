@@ -1,4 +1,3 @@
-import React from 'react';
 
 const VotingSystemSelector = ({ selected, onChange }: { selected: string, onChange: (value: string) => void }) => {
   const options = [

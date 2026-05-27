@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { socket } from './socket';
 import './App.css';
 import { Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -86,7 +86,7 @@ const SessionPage = () => {
       socket.emit('join_session', sessionId);
     }
 
-    socket.on('session_joined', (joinedSessionId, userList, adminId) => {
+    socket.on('session_joined', (_joinedSessionId, userList, adminId) => {
       setUsers(userList);
       if (adminId === socket.id) {
         setIsAdmin(true);
@@ -97,7 +97,7 @@ const SessionPage = () => {
       setUsers(userList);
     });
 
-    socket.on('cards_revealed', (userList, avg) => {
+    socket.on('cards_revealed', (userList, _avg) => {
       setReveal(true);
       setUsers(userList);
     });
