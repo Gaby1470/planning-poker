@@ -183,23 +183,60 @@ const SessionPage = () => {
 
   if (!joined) {
     return (
-      <div className="container narrow-card">
-        <button className="btn-back-home" onClick={() => navigate('/')}>
-          🏠 Back to Home
-        </button>
-        <h1>Lobby Invitation</h1>
-        <p className="subtitle">You're joining: <strong>{sessionId}</strong></p>
-        <div className="form-group">
+      <div className="container narrow-card" style={{ textAlign: 'center', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👋 Welcome!</h1>
+        <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+          You've been invited to the planning session:
+        </p>
+        <p style={{ 
+          fontSize: '1.5rem', 
+          fontWeight: 'bold', 
+          color: 'var(--primary)', 
+          background: 'rgba(79, 70, 229, 0.05)', 
+          padding: '0.75rem 1.5rem', 
+          borderRadius: '8px',
+          display: 'inline-block',
+          border: '1px solid rgba(79, 70, 229, 0.1)',
+          marginBottom: '2.5rem'
+        }}>
+          {sessionId}
+        </p>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <input
             type="text"
-            placeholder="What should we call you?"
+            placeholder="Enter your name to join"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
+            style={{
+              padding: '1rem',
+              fontSize: '1rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              textAlign: 'center'
+            }}
           />
-          <button className="btn-primary full-width" onClick={joinSession} disabled={!userName.trim()}>
-            Enter Session
+          <button 
+            className="btn-primary" 
+            onClick={joinSession} 
+            disabled={!userName.trim()}
+            style={{
+              padding: '1rem',
+              fontSize: '1.1rem',
+              width: '100%'
+            }}
+          >
+            Join Session
           </button>
         </div>
+        
+        <button 
+          className="btn-back-home" 
+          onClick={() => navigate('/')}
+          style={{ marginTop: '2rem', fontSize: '0.9rem' }}
+        >
+          Or create your own session
+        </button>
       </div>
     );
   }
