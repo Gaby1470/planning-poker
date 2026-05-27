@@ -1,0 +1,320 @@
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --success: #10b981;
+  --success-hover: #059669;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 12px;
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2.5rem;
+  position: relative; /* Essential for relative anchor tracking */
+}
+
+.narrow-card { 
+  max-width: 420px; 
+  text-align: center; 
+}
+
+/* Positioned Top-Right Corner Exit Architecture */
+.nav-exit-button {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 10;
+}
+
+.nav-exit-button:hover {
+  background: #f1f5f9;
+  color: var(--danger);
+  border-color: #fca5a5;
+}
+
+.btn-back-home {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+.btn-back-home:hover {
+  color: var(--primary);
+}
+
+/* Home Screen Layout Panels */
+.auth-split {
+  display: flex;
+  gap: 2rem;
+  margin-top: 3rem;
+  align-items: center;
+}
+.auth-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.divider-vertical {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+/* Form controls */
+input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Button UI Components */
+button {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-secondary { background: var(--border); color: var(--text-main); }
+.btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: var(--success-hover); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: var(--danger-hover); }
+
+/* Header Formatting Block */
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  margin-top: 1.5rem; /* Pushes layout down nicely below top absolute controls */
+}
+.share-box { display: flex; gap: 0.5rem; align-items: center; }
+.share-box input { max-width: 240px; background: var(--bg-app); font-size: 0.85rem; }
+
+.badge-admin {
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+/* Card Workspace Array Layout */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+  margin: 3rem 0;
+}
+
+.user-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* 3D True Card Flipping Deck Setup */
+.poker-card {
+  width: 90px;
+  height: 135px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.poker-card.revealed { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.card-front {
+  background: linear-gradient(135deg, var(--primary), #6366f1);
+  color: white;
+  border: 2px solid white;
+}
+.card-status { font-size: 1.25rem; }
+
+.card-back {
+  background: var(--bg-surface);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  transform: rotateY(180deg);
+}
+
+.user-card-wrapper.has-voted .card-front {
+  background: linear-gradient(135deg, #312e81, var(--primary));
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Estimation Deck Selections */
+.deck {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.deck-card {
+  width: 55px;
+  height: 80px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  color: var(--text-main);
+  font-size: 1.25rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.deck-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.deck-card.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+}
+
+/* Scoring Results Metrics Presentation Block */
+.results-banner {
+  background: linear-gradient(to right, #f4f4fe, #ede9fe);
+  border: 1px solid #c084fc;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  margin: 2rem 0;
+  animation: fadeIn 0.3s ease-out;
+}
+.results-banner h3 { 
+  margin: 0 0 0.5rem 0; 
+  color: var(--primary); 
+  font-size: 0.9rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.05em;
+}
+.results-banner .metric { 
+  font-size: 3rem; 
+  font-weight: 900; 
+  color: var(--primary); 
+  line-height: 1;
+}
+.results-banner .subtitle-metric {
+  margin: 0.5rem 0 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  padding: 3rem;
+  background-color: var(--bg-app);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+/* Core Interface Control Action Panels */
+.action-tray {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+.admin-tray {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .auth-split { flex-direction: column; }
+  .divider-vertical { margin: 1rem 0; }
+  .session-header { flex-direction: column; align-items: flex-start; margin-top: 3rem; }
+  .share-box { width: 100%; }
+  .share-box input { max-width: none; flex-grow: 1; }
+}

@@ -1,0 +1,96 @@
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+const sessions = {};
+
+io.on('connection', (socket) => {
+  console.log('a user connected', socket.id);
+
+  socket.on('create_session', (sessionId) => {
+    if (sessions[sessionId]) {
+      socket.emit('session_exists');
+    } else {
+      sessions[sessionId] = {
+        admin: socket.id,
+        users: [],
+        reveal: false,
+      };
+      socket.join(sessionId);
+      socket.emit('session_created', sessionId);
+    }
+  });
+
+  socket.on('join_session', (sessionId, userName) => {
+    if (sessions[sessionId]) {
+      if (userName) {
+        const newUser = { id: socket.id, name: userName, vote: null };
+        sessions[sessionId].users.push(newUser);
+        io.to(sessionId).emit('update_users', sessions[sessionId].users);
+      }
+      socket.join(sessionId);
+      socket.emit('session_joined', sessionId, sessions[sessionId].users, sessions[sessionId].admin);
+    } else {
+      socket.emit('session_not_found');
+    }
+  });
+
+  socket.on('vote', (sessionId, vote) => {
+    if (sessions[sessionId]) {
+      const user = sessions[sessionId].users.find((u) => u.id === socket.id);
+      if (user) {
+        user.vote = vote;
+        io.to(sessionId).emit('update_users', sessions[sessionId].users);
+      }
+    }
+  });
+
+  socket.on('reveal_cards', (sessionId) => {
+    if (sessions[sessionId]) {
+      sessions[sessionId].reveal = true;
+      const votes = sessions[sessionId].users.map((u) => u.vote).filter((v) => v !== null);
+      const avg = votes.length > 0 ? votes.reduce((acc, v) => acc + v, 0) / votes.length : 0;
+      io.to(sessionId).emit('cards_revealed', sessions[sessionId].users, avg);
+    }
+  });
+
+  socket.on('restart_vote', (sessionId) => {
+    if (sessions[sessionId]) {
+      sessions[sessionId].reveal = false;
+      sessions[sessionId].users.forEach((u) => (u.vote = null));
+      io.to(sessionId).emit('vote_restarted', sessions[sessionId].users);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected', socket.id);
+    for (const sessionId in sessions) {
+      const index = sessions[sessionId].users.findIndex((u) => u.id === socket.id);
+      if (index !== -1) {
+        sessions[sessionId].users.splice(index, 1);
+        io.to(sessionId).emit('update_users', sessions[sessionId].users);
+        if (sessions[sessionId].users.length === 0) {
+          delete sessions[sessionId];
+        }
+        break;
+      }
+    }
+  });
+});
+
+const port = process.env.PORT || 3001;
+server.listen(port, () => {
+  console.log(`listening on *:${port}`);
+});
