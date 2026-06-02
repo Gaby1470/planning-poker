@@ -16,6 +16,7 @@ const SessionPage = () => {
   const [joined, setJoined] = useState(location.state?.isAdmin || false);
   const [currentVote, setCurrentVote] = useState<number | string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [highlightedUsers, setHighlightedUsers] = useState<{ user1: string, user2: string } | null>(null);
   const { votingSystem, setVotingSystem, getVotingOptions } = useVotingSystem();
 
   useEffect(() => {
@@ -43,6 +44,11 @@ const SessionPage = () => {
       setReveal(false);
       setCurrentVote(null);
       setUsers(userList);
+      setHighlightedUsers(null);
+    });
+
+    socket.on('highlight_users', (users) => {
+      setHighlightedUsers(users);
     });
 
     socket.on('session_not_found', () => {
@@ -55,6 +61,7 @@ const SessionPage = () => {
       socket.off('cards_revealed');
       socket.off('vote_restarted');
       socket.off('session_not_found');
+      socket.off('highlight_users');
     };
   }, [sessionId, isAdmin]);
 
@@ -183,7 +190,7 @@ const SessionPage = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {validUsers.map((user) => (
-              <div key={user.id} className="text-center">
+              <div key={user.id} className={`text-center p-2 rounded-lg transition-transform duration-300 ${highlightedUsers && (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2) ? 'transform scale-110 shadow-lg z-10' : ''}`}>
                 <div className={`relative w-24 h-36 mx-auto rounded-lg shadow-md transition-transform transform ${reveal ? 'rotate-y-180' : ''}`}>
                   <div className="absolute inset-0 bg-white rounded-lg flex items-center justify-center">
                     <span className="text-2xl">{user.vote ? '👍' : '⏳'}</span>

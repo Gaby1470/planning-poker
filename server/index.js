@@ -63,6 +63,24 @@ io.on('connection', (socket) => {
       const votes = sessions[sessionId].users.map((u) => u.vote).filter((v) => v !== null);
       const avg = votes.length > 0 ? votes.reduce((acc, v) => acc + v, 0) / votes.length : 0;
       io.to(sessionId).emit('cards_revealed', sessions[sessionId].users, avg);
+
+      const numericVotes = votes.map(v => Number(v)).filter(v => !isNaN(v) && v > 0);
+      if (numericVotes.length > 1) {
+        const minVote = Math.min(...numericVotes);
+        const maxVote = Math.max(...numericVotes);
+
+        if (maxVote >= minVote * 3) {
+          const minVoters = sessions[sessionId].users.filter(u => Number(u.vote) === minVote);
+          const maxVoters = sessions[sessionId].users.filter(u => Number(u.vote) === maxVote);
+
+          const randomMinVoter = minVoters[Math.floor(Math.random() * minVoters.length)];
+          const randomMaxVoter = maxVoters[Math.floor(Math.random() * maxVoters.length)];
+
+          if (randomMinVoter && randomMaxVoter) {
+            io.to(sessionId).emit('highlight_users', { user1: randomMinVoter.id, user2: randomMaxVoter.id });
+          }
+        }
+      }
     }
   });
 

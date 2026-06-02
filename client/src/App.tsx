@@ -80,6 +80,7 @@ const SessionPage = () => {
   const [joined, setJoined] = useState(location.state?.isAdmin || false);
   const [currentVote, setCurrentVote] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [highlightedUsers, setHighlightedUsers] = useState<{ user1: string; user2: string } | null>(null);
 
   useEffect(() => {
     if (isAdmin) {
@@ -106,6 +107,11 @@ const SessionPage = () => {
       setReveal(false);
       setCurrentVote(null);
       setUsers(userList);
+      setHighlightedUsers(null);
+    });
+
+    socket.on('highlight_users', (users) => {
+      setHighlightedUsers(users);
     });
 
     socket.on('session_not_found', () => {
@@ -117,6 +123,7 @@ const SessionPage = () => {
       socket.off('update_users');
       socket.off('cards_revealed');
       socket.off('vote_restarted');
+      socket.off('highlight_users');
       socket.off('session_not_found');
     };
   }, [sessionId, isAdmin]);
@@ -272,7 +279,14 @@ const SessionPage = () => {
         ) : (
           <div className="users-grid">
             {validUsers.map((user) => (
-              <div key={user.id} className={`user-card-wrapper ${user.vote ? 'has-voted' : ''}`}>
+              <div
+                key={user.id}
+                className={`user-card-wrapper ${user.vote ? 'has-voted' : ''} ${
+                  highlightedUsers && (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2)
+                    ? 'elevated'
+                    : ''
+                }`}
+              >
                 <div className={`poker-card ${reveal ? 'revealed' : ''}`}>
                   <div className="card-face card-front">
                     <span className="card-status">{user.vote ? '👍' : '⏳'}</span>

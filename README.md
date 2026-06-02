@@ -124,6 +124,7 @@ Start the client:
 
 ```bash
 npm run dev
+npm run build
 ```
 
 The client will be running on `http://localhost:5173` by default. Open this URL in your browser to use the application.
