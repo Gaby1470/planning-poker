@@ -1,5 +1,17 @@
 # Planning Poker
 
+## Quick Start
+
+Run these in two separate terminals from the project root:
+
+```bash
+cd server && npm install && npm start
+```
+
+```bash
+cd client && npm install && npm run dev
+```
+
 This is a simple real-time Planning Poker application built with React, Node.js, and Socket.io.
 
 ## Features

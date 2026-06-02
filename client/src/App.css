@@ -1,6 +1,6 @@
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --primary: #09b02c;
+  --primary-hover: #078e23;
   --success: #10b981;
   --success-hover: #059669;
   --danger: #ef4444;
@@ -109,7 +109,7 @@ input[type="text"] {
 input[type="text"]:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  box-shadow: 0 0 0 3px rgba(9, 176, 44, 0.15);
 }
 
 /* Button UI Components */
@@ -148,7 +148,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .share-box input { max-width: 240px; background: var(--bg-app); font-size: 0.85rem; }
 
 .badge-admin {
-  background: rgba(79, 70, 229, 0.1);
+  background: rgba(9, 176, 44, 0.1);
   color: var(--primary);
   padding: 0.25rem 0.6rem;
   border-radius: 20px;
@@ -199,7 +199,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .card-front {
-  background: linear-gradient(135deg, var(--primary), #6366f1);
+  background: linear-gradient(135deg, var(--primary), #10c93f);
   color: white;
   border: 2px solid white;
 }
@@ -213,8 +213,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .user-card-wrapper.has-voted .card-front {
-  background: linear-gradient(135deg, #312e81, var(--primary));
-  box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+  background: linear-gradient(135deg, #066c1b, var(--primary));
+  box-shadow: 0 0 15px rgba(9, 176, 44, 0.4);
 }
 
 .user-name {
@@ -254,13 +254,13 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: white;
   border-color: var(--primary);
   transform: translateY(-10px);
-  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 8px 16px rgba(9, 176, 44, 0.3);
 }
 
 /* Scoring Results Metrics Presentation Block */
 .results-banner {
-  background: linear-gradient(to right, #f4f4fe, #ede9fe);
-  border: 1px solid #c084fc;
+  background: linear-gradient(to right, #f0fff4, #dcfce7);
+  border: 1px solid rgba(9, 176, 44, 0.45);
   padding: 1.5rem;
   border-radius: var(--radius);
   text-align: center;

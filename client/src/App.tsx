@@ -192,11 +192,11 @@ const SessionPage = () => {
           fontSize: '1.5rem', 
           fontWeight: 'bold', 
           color: 'var(--primary)', 
-          background: 'rgba(79, 70, 229, 0.05)', 
+          background: 'rgba(9, 176, 44, 0.05)', 
           padding: '0.75rem 1.5rem', 
           borderRadius: '8px',
           display: 'inline-block',
-          border: '1px solid rgba(79, 70, 229, 0.1)',
+          border: '1px solid rgba(9, 176, 44, 0.1)',
           marginBottom: '2.5rem'
         }}>
           {sessionId}
@@ -328,8 +328,8 @@ const SessionPage = () => {
 
         {isAdmin && (
           <div className="admin-tray">
-            <button className="btn-success" onClick={revealCards}>👁 Reveal Estimates</button>
-            <button className="btn-danger" onClick={restartVote}>🔄 Clear & Next Round</button>
+            <button className="btn-success" onClick={revealCards}>Reveal Estimates</button>
+            <button className="btn-danger" onClick={restartVote}>Clear & Next Round</button>
           </div>
         )}
       </footer>
