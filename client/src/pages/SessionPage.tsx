@@ -12,17 +12,13 @@ const SessionPage = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [reveal, setReveal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(location.state?.isAdmin || false);
-  const [joined, setJoined] = useState(location.state?.isAdmin || false);
+  const [joined, setJoined] = useState(false);
   const [currentVote, setCurrentVote] = useState<number | string | null>(null);
   const [copied, setCopied] = useState(false);
   const [highlightedUsers, setHighlightedUsers] = useState<{ user1: string, user2: string } | null>(null);
   const { setVotingSystem, getVotingOptions } = useVotingSystem();
 
   useEffect(() => {
-    if (isAdmin) {
-      socket.emit('join_session', sessionId);
-    }
-
     socket.on('session_joined', (_joinedSessionId, userList, adminId, receivedVotingSystem) => {
       setUsers(userList);
       if (adminId === socket.id) {
@@ -70,7 +66,7 @@ const SessionPage = () => {
       socket.off('highlight_users');
       socket.off('voting_system_changed');
     };
-  }, [sessionId, isAdmin, setVotingSystem]);
+  }, [sessionId, setVotingSystem]);
 
   const joinSession = () => {
     if (sessionId && userName.trim()) {
