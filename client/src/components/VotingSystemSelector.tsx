@@ -3,24 +3,27 @@ const VotingSystemSelector = ({ selected, onChange }: { selected: string, onChan
   const options = [
     { value: 'fibonacci', label: 'Fibonacci' },
     { value: 't-shirt', label: 'T-Shirt Sizes' },
+    { value: 'sequential', label: 'Sequential' },
   ];
 
   return (
-    <div className="flex items-center space-x-4">
-      <h4 className="text-lg font-semibold text-gray-800">Voting System</h4>
-      <select
-        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={selected}
-        onChange={(e) => onChange(e.target.value)}
-      >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Voting System</h4>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <button
+            key={option.value}
+            className={selected === option.value ? 'btn-primary' : 'btn-secondary'}
+            onClick={() => onChange(option.value)}
+            style={{ flex: 1, padding: '0.75rem' }}
+          >
             {option.label}
-          </option>
+          </button>
         ))}
-      </select>
+      </div>
     </div>
   );
 };
 
 export default VotingSystemSelector;
+

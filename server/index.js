@@ -19,7 +19,7 @@ const sessions = {};
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id);
 
-  socket.on('create_session', (sessionId) => {
+  socket.on('create_session', ({ sessionId, votingSystem }) => {
     if (sessions[sessionId]) {
       socket.emit('session_exists');
     } else {
@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
         admin: socket.id,
         users: [],
         reveal: false,
+        votingSystem: votingSystem,
       };
       socket.join(sessionId);
       socket.emit('session_created', sessionId);
@@ -41,7 +42,7 @@ io.on('connection', (socket) => {
         io.to(sessionId).emit('update_users', sessions[sessionId].users);
       }
       socket.join(sessionId);
-      socket.emit('session_joined', sessionId, sessions[sessionId].users, sessions[sessionId].admin);
+      socket.emit('session_joined', sessionId, sessions[sessionId].users, sessions[sessionId].admin, sessions[sessionId].votingSystem);
     } else {
       socket.emit('session_not_found');
     }

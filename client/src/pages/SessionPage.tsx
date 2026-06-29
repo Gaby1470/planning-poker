@@ -3,7 +3,6 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { socket } from '../socket';
 import toast from 'react-hot-toast';
 import { useVotingSystem } from '../hooks/useVotingSystem';
-import VotingSystemSelector from '../components/VotingSystemSelector';
 
 const SessionPage = () => {
   const { sessionId } = useParams();
@@ -17,17 +16,20 @@ const SessionPage = () => {
   const [currentVote, setCurrentVote] = useState<number | string | null>(null);
   const [copied, setCopied] = useState(false);
   const [highlightedUsers, setHighlightedUsers] = useState<{ user1: string, user2: string } | null>(null);
-  const { votingSystem, setVotingSystem, getVotingOptions } = useVotingSystem();
+  const { setVotingSystem, getVotingOptions } = useVotingSystem();
 
   useEffect(() => {
     if (isAdmin) {
       socket.emit('join_session', sessionId);
     }
 
-    socket.on('session_joined', (_joinedSessionId, userList, adminId) => {
+    socket.on('session_joined', (_joinedSessionId, userList, adminId, receivedVotingSystem) => {
       setUsers(userList);
       if (adminId === socket.id) {
         setIsAdmin(true);
+      }
+      if (receivedVotingSystem) {
+        setVotingSystem(receivedVotingSystem);
       }
     });
 
@@ -55,6 +57,10 @@ const SessionPage = () => {
       toast.error('Session not found');
     });
 
+    socket.on('voting_system_changed', (newVotingSystem) => {
+        setVotingSystem(newVotingSystem);
+    });
+
     return () => {
       socket.off('session_joined');
       socket.off('update_users');
@@ -62,8 +68,9 @@ const SessionPage = () => {
       socket.off('vote_restarted');
       socket.off('session_not_found');
       socket.off('highlight_users');
+      socket.off('voting_system_changed');
     };
-  }, [sessionId, isAdmin]);
+  }, [sessionId, isAdmin, setVotingSystem]);
 
   const joinSession = () => {
     if (sessionId && userName.trim()) {
@@ -127,79 +134,98 @@ const SessionPage = () => {
 
   if (!joined) {
     return (
-      <div className="container mx-auto px-4 py-16 max-w-md">
-        <button
-          className="absolute top-4 left-4 text-gray-600 hover:text-gray-800"
-          onClick={() => navigate('/')}
-        >
-          🏠 Back to Home
-        </button>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Lobby Invitation</h1>
-        <p className="text-lg text-gray-600 mb-8">You're joining: <strong>{sessionId}</strong></p>
-        <div className="flex flex-col space-y-4">
-          <input
-            type="text"
-            placeholder="What should we call you?"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
-            onClick={joinSession}
-            disabled={!userName.trim()}
-          >
-            Enter Session
-          </button>
+        <div className="container narrow-card" style={{ textAlign: 'center', margin: '0 auto' }}>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👋 Welcome!</h1>
+            <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                You've been invited to the planning session:
+            </p>
+            <p style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: 'var(--primary)',
+                background: 'rgba(9, 176, 44, 0.05)',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                display: 'inline-block',
+                border: '1px solid rgba(9, 176, 44, 0.1)',
+                marginBottom: '2.5rem'
+            }}>
+                {sessionId}
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <input
+                    type="text"
+                    placeholder="Enter your name to join"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                />
+                <button
+                    className="btn-primary"
+                    onClick={joinSession}
+                    disabled={!userName.trim()}
+                >
+                    Join Session
+                </button>
+            </div>
+
+            <button
+                className="btn-back-home"
+                onClick={() => navigate('/')}
+            >
+                Or create your own session
+            </button>
         </div>
-      </div>
     );
-  }
+}
 
   const validUsers = users.filter((user) => user && user.name);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <button
-        className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-        onClick={leaveSession}
-        title="Exit session and make a new room"
-      >
+    <div className="container session-layout">
+      <button className="nav-exit-button" onClick={leaveSession} title="Exit session and make a new room">
         🚪 Exit Room
       </button>
 
-      <header className="flex justify-between items-center mb-8">
+      <header className="session-header">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Room: {sessionId}</h1>
-          {isAdmin && <span className="inline-block px-3 py-1 text-sm font-semibold text-white bg-blue-500 rounded-full">Host Admin</span>}
+          <h1>Room: {sessionId}</h1>
+          {isAdmin && <span className="badge-admin">Host Admin</span>}
         </div>
-        <div className="flex items-center">
-          <input type="text" readOnly value={window.location.href} className="w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" />
-          <button onClick={copyToClipboard} className={`ml-2 px-4 py-2 font-semibold rounded-lg ${copied ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>
+        <div className="share-box">
+          <input type="text" readOnly value={window.location.href} />
+          <button onClick={copyToClipboard} className={copied ? "btn-success" : ""}>
             {copied ? 'Copied!' : 'Copy Link'}
           </button>
         </div>
       </header>
 
-      <main className="mb-8">
+      <main className="session-workspace">
         {validUsers.length === 0 ? (
-          <div className="text-center py-16">
-            <h2 className="text-3xl font-bold text-gray-800">⏳ Waiting for your squad...</h2>
-            <p className="text-xl text-gray-600 mt-4">Send the invite link to your product managers, developers, and testers.</p>
+          <div className="empty-state">
+            <h2>⏳ Waiting for your squad...</h2>
+            <p>Send the invite link to your product managers, developers, and testers.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="users-grid">
             {validUsers.map((user) => (
-              <div key={user.id} className={`text-center p-2 rounded-lg transition-transform duration-300 ${highlightedUsers && (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2) ? 'transform scale-110 shadow-lg z-10' : ''}`}>
-                <div className={`relative w-24 h-36 mx-auto rounded-lg shadow-md transition-transform transform ${reveal ? 'rotate-y-180' : ''}`}>
-                  <div className="absolute inset-0 bg-white rounded-lg flex items-center justify-center">
-                    <span className="text-2xl">{user.vote ? '👍' : '⏳'}</span>
+              <div
+                key={user.id}
+                className={`user-card-wrapper ${user.vote ? 'has-voted' : ''} ${
+                  highlightedUsers && (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2)
+                    ? 'elevated'
+                    : ''
+                }`}
+              >
+                <div className={`poker-card ${reveal ? 'revealed' : ''}`}>
+                  <div className="card-face card-front">
+                    <span className="card-status">{user.vote ? '👍' : '⏳'}</span>
                   </div>
-                  <div className="absolute inset-0 bg-blue-500 rounded-lg flex items-center justify-center text-white text-3xl font-bold backface-hidden rotate-y-180">
+                  <div className="card-face card-back">
                     {user.vote ?? '-'}
                   </div>
                 </div>
-                <p className="mt-4 text-lg font-semibold text-gray-800">{user.name}</p>
+                <p className="user-name">{user.name}</p>
               </div>
             ))}
           </div>
@@ -207,52 +233,49 @@ const SessionPage = () => {
       </main>
 
       {reveal && calculateMode(validUsers) && (
-        <section className="bg-gray-100 rounded-lg p-6 mb-8">
+        <section className="results-banner">
           {(() => {
             const result = calculateMode(validUsers);
             if (!result) return null;
-
+            
             const isTie = result.modes.length > 1;
             return (
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-800">{isTie ? "Split Consensus (Tie)" : "Team Consensus (Mode)"}</h3>
-                <div className="text-5xl font-bold text-blue-500 my-4">
+              <>
+                <h3>{isTie ? "Split Consensus (Tie)" : "Team Consensus (Mode)"}</h3>
+                <div className="metric">
                   {result.modes.join(' & ')}
                 </div>
-                <p className="text-lg text-gray-600">
+                <p className="subtitle-metric">
                   {result.count} {result.count === 1 ? 'person' : 'people'} voted for this estimate
                 </p>
-              </div>
+              </>
             );
           })()}
         </section>
       )}
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h4 className="text-lg font-semibold text-gray-800">Cast Your Estimate</h4>
-            <div className="flex space-x-2">
-              {getVotingOptions().map((value) => (
-                <button
-                  key={value}
-                  className={`w-12 h-16 rounded-lg font-semibold transition-colors ${currentVote === value ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                  onClick={() => vote(value)}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
+      <footer className="action-tray">
+        <div className="voting-section">
+          <h4 style={{textAlign: 'center', margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 600}}>Cast Your Estimate</h4>
+          <div className="deck">
+            {getVotingOptions().map((value) => (
+              <button 
+                key={value} 
+                className={`deck-card ${currentVote === value ? 'selected' : ''}`}
+                onClick={() => vote(value)}
+              >
+                {value}
+              </button>
+            ))}
           </div>
-
-          {isAdmin && (
-            <div className="flex items-center space-x-4">
-              <VotingSystemSelector selected={votingSystem} onChange={setVotingSystem} />
-              <button className="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600" onClick={revealCards}>Reveal Estimates</button>
-              <button className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600" onClick={restartVote}>Clear & Next Round</button>
-            </div>
-          )}
         </div>
+
+        {isAdmin && (
+          <div className="admin-tray">
+            <button className="btn-success" onClick={revealCards}>Reveal Estimates</button>
+            <button className="btn-danger" onClick={restartVote}>Clear & Next Round</button>
+          </div>
+        )}
       </footer>
     </div>
   );
