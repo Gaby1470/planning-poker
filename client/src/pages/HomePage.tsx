@@ -15,7 +15,7 @@ const HomePage = () => {
   const createSession = () => {
     if (createId.trim()) {
       socket.emit('create_session', { 
-        sessionId: createId.trim(),
+        sessionName: createId.trim(),
         votingSystem: votingSystem 
       });
     }

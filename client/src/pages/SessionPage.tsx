@@ -9,23 +9,40 @@ const SessionPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
+  const [sessionName, setSessionName] = useState('');
   const [users, setUsers] = useState<any[]>([]);
   const [reveal, setReveal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(location.state?.isAdmin || false);
-  const [joined, setJoined] = useState(false);
+  const [joined, setJoined] = useState(location.state?.isAdmin || false);
   const [currentVote, setCurrentVote] = useState<number | string | null>(null);
   const [copied, setCopied] = useState(false);
   const [highlightedUsers, setHighlightedUsers] = useState<{ user1: string, user2: string } | null>(null);
   const { setVotingSystem, getVotingOptions } = useVotingSystem();
 
   useEffect(() => {
-    socket.on('session_joined', (_joinedSessionId, userList, adminId, receivedVotingSystem) => {
+    if (isAdmin) {
+      socket.emit('join_session', sessionId, 'Admin');
+    } else {
+      // For guests, we can emit a request to get session details without joining
+      socket.emit('get_session_details', sessionId);
+    }
+    
+    socket.on('session_joined', (_joinedSessionId, userList, adminId, receivedVotingSystem, receivedSessionName) => {
       setUsers(userList);
       if (adminId === socket.id) {
         setIsAdmin(true);
       }
       if (receivedVotingSystem) {
         setVotingSystem(receivedVotingSystem);
+      }
+      if (receivedSessionName) {
+        setSessionName(receivedSessionName);
+      }
+    });
+
+    socket.on('session_details', (details) => {
+      if (details.sessionName) {
+        setSessionName(details.sessionName);
       }
     });
 
@@ -59,6 +76,7 @@ const SessionPage = () => {
 
     return () => {
       socket.off('session_joined');
+      socket.off('session_details');
       socket.off('update_users');
       socket.off('cards_revealed');
       socket.off('vote_restarted');
@@ -66,7 +84,7 @@ const SessionPage = () => {
       socket.off('highlight_users');
       socket.off('voting_system_changed');
     };
-  }, [sessionId, setVotingSystem]);
+  }, [sessionId, isAdmin, setVotingSystem]);
 
   const joinSession = () => {
     if (sessionId && userName.trim()) {
@@ -146,7 +164,7 @@ const SessionPage = () => {
                 border: '1px solid rgba(9, 176, 44, 0.1)',
                 marginBottom: '2.5rem'
             }}>
-                {sessionId}
+                {sessionName || sessionId}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -185,7 +203,7 @@ const SessionPage = () => {
 
       <header className="session-header">
         <div>
-          <h1>Room: {sessionId}</h1>
+          <h1>Room: {sessionName || sessionId}</h1>
           {isAdmin && <span className="badge-admin">Host Admin</span>}
         </div>
         <div className="share-box">
