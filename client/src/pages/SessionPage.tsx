@@ -10,6 +10,7 @@ const SessionPage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('');
   const [sessionName, setSessionName] = useState('');
+  const [isLoadingName, setIsLoadingName] = useState(true);
   const [users, setUsers] = useState<any[]>([]);
   const [reveal, setReveal] = useState(false);
   const [isAdmin, setIsAdmin] = useState(location.state?.isAdmin || false);
@@ -23,7 +24,6 @@ const SessionPage = () => {
     if (isAdmin) {
       socket.emit('join_session', sessionId, 'Admin');
     } else {
-      // For guests, we can emit a request to get session details without joining
       socket.emit('get_session_details', sessionId);
     }
     
@@ -38,12 +38,14 @@ const SessionPage = () => {
       if (receivedSessionName) {
         setSessionName(receivedSessionName);
       }
+      setIsLoadingName(false);
     });
 
     socket.on('session_details', (details) => {
       if (details.sessionName) {
         setSessionName(details.sessionName);
       }
+      setIsLoadingName(false);
     });
 
     socket.on('update_users', (userList) => {
@@ -68,6 +70,7 @@ const SessionPage = () => {
 
     socket.on('session_not_found', () => {
       toast.error('Session not found');
+      setIsLoadingName(false);
     });
 
     socket.on('voting_system_changed', (newVotingSystem) => {
@@ -164,7 +167,7 @@ const SessionPage = () => {
                 border: '1px solid rgba(9, 176, 44, 0.1)',
                 marginBottom: '2.5rem'
             }}>
-                {sessionName || sessionId}
+                {isLoadingName ? 'Loading Session...' : (sessionName || sessionId)}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -203,7 +206,7 @@ const SessionPage = () => {
 
       <header className="session-header">
         <div>
-          <h1>Room: {sessionName || sessionId}</h1>
+          <h1>Room: {isLoadingName ? '...' : (sessionName || sessionId)}</h1>
           {isAdmin && <span className="badge-admin">Host Admin</span>}
         </div>
         <div className="share-box">
