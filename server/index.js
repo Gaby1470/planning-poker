@@ -18,6 +18,34 @@ const io = new Server(server, {
 
 const sessions = {};
 
+const updateHighlights = (sessionId, io, sessions) => {
+  const session = sessions[sessionId];
+  if (!session) return;
+
+  const votes = session.users.map((u) => u.vote).filter((v) => v !== null);
+  const numericVotes = votes.map(v => Number(v)).filter(v => !isNaN(v) && v > 0);
+
+  if (numericVotes.length > 1) {
+    const minVote = Math.min(...numericVotes);
+    const maxVote = Math.max(...numericVotes);
+
+    if (minVote !== maxVote) {
+      const minVoters = session.users.filter(u => Number(u.vote) === minVote);
+      const maxVoters = session.users.filter(u => Number(u.vote) === maxVote);
+
+      const randomMinVoter = minVoters[Math.floor(Math.random() * minVoters.length)];
+      const randomMaxVoter = maxVoters[Math.floor(Math.random() * maxVoters.length)];
+
+      if (randomMinVoter && randomMaxVoter) {
+        io.to(sessionId).emit('highlight_users', { user1: randomMinVoter.id, user2: randomMaxVoter.id });
+        return;
+      }
+    }
+  }
+  // If conditions are not met, clear highlights
+  io.to(sessionId).emit('highlight_users', null);
+};
+
 io.on('connection', (socket) => {
   console.log('a user connected', socket.id);
 
@@ -63,6 +91,10 @@ io.on('connection', (socket) => {
       if (user) {
         user.vote = vote;
         io.to(sessionId).emit('update_users', sessions[sessionId].users);
+
+        if (sessions[sessionId].reveal) {
+          updateHighlights(sessionId, io, sessions);
+        }
       }
     }
   });
@@ -73,24 +105,7 @@ io.on('connection', (socket) => {
       const votes = sessions[sessionId].users.map((u) => u.vote).filter((v) => v !== null);
       const avg = votes.length > 0 ? votes.reduce((acc, v) => acc + v, 0) / votes.length : 0;
       io.to(sessionId).emit('cards_revealed', sessions[sessionId].users, avg);
-
-      const numericVotes = votes.map(v => Number(v)).filter(v => !isNaN(v) && v > 0);
-      if (numericVotes.length > 1) {
-        const minVote = Math.min(...numericVotes);
-        const maxVote = Math.max(...numericVotes);
-
-        if (maxVote >= minVote * 3) {
-          const minVoters = sessions[sessionId].users.filter(u => Number(u.vote) === minVote);
-          const maxVoters = sessions[sessionId].users.filter(u => Number(u.vote) === maxVote);
-
-          const randomMinVoter = minVoters[Math.floor(Math.random() * minVoters.length)];
-          const randomMaxVoter = maxVoters[Math.floor(Math.random() * maxVoters.length)];
-
-          if (randomMinVoter && randomMaxVoter) {
-            io.to(sessionId).emit('highlight_users', { user1: randomMinVoter.id, user2: randomMaxVoter.id });
-          }
-        }
-      }
+      updateHighlights(sessionId, io, sessions);
     }
   });
 
