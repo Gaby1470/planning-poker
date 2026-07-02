@@ -193,7 +193,7 @@ const SessionPage = () => {
     );
 }
 
-  const validUsers = users.filter((user) => user && user.name);
+  const validUsers = users.filter((user) => user && user.name && !user.isAdmin);
 
   return (
     <div className="container session-layout">

@@ -37,7 +37,8 @@ io.on('connection', (socket) => {
   socket.on('join_session', (sessionId, userName) => {
     if (sessions[sessionId]) {
       if (userName) {
-        const newUser = { id: socket.id, name: userName, vote: null };
+        const isAdmin = sessions[sessionId].admin === socket.id;
+        const newUser = { id: socket.id, name: userName, vote: null, isAdmin };
         sessions[sessionId].users.push(newUser);
         io.to(sessionId).emit('update_users', sessions[sessionId].users);
       }
