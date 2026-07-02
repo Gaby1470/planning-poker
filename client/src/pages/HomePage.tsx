@@ -47,6 +47,15 @@ const HomePage = () => {
         <p>Streamline your agile estimations elegantly and in real-time.</p>
       </div>
 
+      <div className="pro-instructions">
+        <h3>How It Works</h3>
+        <ol>
+          <li>Create a session and share the link with your team.</li>
+          <li>Each member casts their vote privately.</li>
+          <li>Once the host reveals the cards, the discussion begins! To guide the conversation, the cards of the participants with the <strong>highest and lowest estimates</strong> will be highlighted. This helps the team quickly identify differing perspectives and converge on a consensus.</li>
+        </ol>
+      </div>
+
       <div className="pro-card">
         <div className="pro-grid">
           

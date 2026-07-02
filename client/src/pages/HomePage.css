@@ -48,6 +48,41 @@
   margin: 0;
 }
 
+/* Instructions Block */
+.pro-instructions {
+  max-width: 950px;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.pro-instructions h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.pro-instructions ol {
+  padding-left: 1.5rem;
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.pro-instructions li::marker {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.pro-instructions strong {
+  color: #334155;
+  font-weight: 600;
+}
+
 /* Main Card Container - Modified to expand */
 .pro-card {
   width: 100%;
