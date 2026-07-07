@@ -229,7 +229,9 @@ const SessionPage = () => {
               <div
                 key={user.id}
                 className={`user-card-wrapper ${user.vote ? 'has-voted' : ''} ${
-                  highlightedUsers && (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2)
+                  highlightedUsers &&
+                  calculateMode(validUsers)?.modes.length !== 1 &&
+                  (user.id === highlightedUsers.user1 || user.id === highlightedUsers.user2)
                     ? 'elevated'
                     : ''
                 }`}
