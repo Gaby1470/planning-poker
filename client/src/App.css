@@ -173,9 +173,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .user-card-wrapper.elevated {
-  transform: translateY(-14px) scale(1.18);
   z-index: 20;
-  filter: drop-shadow(0 18px 30px rgba(9, 176, 44, 0.25));
+  animation: pulse 1.5s infinite;
 }
 
 .user-card-wrapper.elevated .poker-card {
@@ -317,6 +316,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translateY(-14px) scale(1.18);
+    filter: drop-shadow(0 18px 30px rgba(9, 176, 44, 0.25));
+  }
+  50% {
+    transform: translateY(-20px) scale(1.22);
+    filter: drop-shadow(0 25px 40px rgba(9, 176, 44, 0.35));
+  }
+  100% {
+    transform: translateY(-14px) scale(1.18);
+    filter: drop-shadow(0 18px 30px rgba(9, 176, 44, 0.25));
+  }
 }
 
 @media (max-width: 640px) {
